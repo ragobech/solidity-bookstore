@@ -6,39 +6,46 @@ pragma solidity ^0.5.2;
 * Description: Sample Book Store shop to test out latest Solidity library
 */
 contract BookStore {
-    
+
     address owner;
     uint public books;
     uint constant price = 1 ether;
     mapping(address => uint) public consumer;
-    
-   constructor() public payable {
+    mapping(uint => Cashier) public cashiers;
+
+    struct Cashier {
+        bytes name;
+        uint badgeId;
+    }
+
+    constructor() public payable {
         owner = msg.sender;
         books = 20;
     }
-    
+
+    // validation pre-buying;
     modifier preBuy() {
         require(books > 0);
-        _;     
+        _;
     }
-    
+
     function buyBooks(uint amount) public payable preBuy {
         if (msg.value != (amount * price) || amount > books) {
             revert();
         }
-        
+
         consumer[msg.sender] += amount;
         books -= amount;
     }
-    
+
     function refundBooks(uint amount) public payable {
-         if (msg.value != (amount * price) || amount > books) {
+        if (msg.value != (amount * price) || amount > books) {
             revert();
         }
-        
+
         consumer[msg.sender] -= amount;
         books += amount;
     }
-    
 }
+
 
